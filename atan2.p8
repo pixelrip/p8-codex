@@ -32,23 +32,20 @@ end
 function init_guy()
 	guy={
 		spr=1,
-		pos={x=16,y=16},
-		vel={x=0,y=0}
+		x=16,
+		y=16
 	}
 end
 
 function update_guy()
-	guy.vel.x=0
-	guy.vel.y=0
 	
-	if (btn(⬅️)) guy.vel.x=-1
-	if (btn(➡️)) guy.vel.x=1
-	if (btn(⬆️)) guy.vel.y=-1
-	if (btn(⬇️)) guy.vel.y=1
+	if (btn(0,0)) guy.x-=1
+	if (btn(1,0)) guy.x+=1
+	if (btn(2,0)) guy.y-=1
+	if (btn(3,0)) guy.y+=1
 
 	if (btnp(❎)) fire_bullet(guy,enemy)
 
-	move(guy)
 end
 
 function draw_guy()
@@ -60,12 +57,16 @@ end
 function init_enemy()
 	enemy={
 		spr=2,
-		pos={x=60,y=60},
-		vel={x=0,y=0}
+		x=60,
+		y=60
 	}
 end
 
 function update_enemy()
+	if (btn(0,1)) enemy.x-=1
+	if (btn(1,1)) enemy.x+=1
+	if (btn(2,1)) enemy.y-=1
+	if (btn(3,1)) enemy.y+=1
 end
 
 function draw_enemy()
@@ -80,7 +81,8 @@ end
 
 function update_bullets()
 	for bt in all(bullets) do
-		move(bt)
+		bt.x += sin(bt.ang) * bt.speed 
+		bt.y += cos(bt.ang) * bt.speed
 	end
 end
 
@@ -91,21 +93,14 @@ function draw_bullets()
 end
 
 function fire_bullet(src,tgt)
-	local ang=get_angle(src,tgt)
-	local vx=sin(ang)*2
-	local vy=cos(ang)*2
-	
 	local bt={}
 	bt.spr=3
-	bt.pos={
-		x=src.pos.x,
-		y=src.pos.y
-	}
-	bt.vel={
-		x=vx,
-		y=vy
-	}
+	bt.x=src.x
+	bt.y=src.y
 	
+	bt.ang=get_angle(src,tgt)
+	bt.speed=2
+		
 	add(bullets,bt)	
 end
 
@@ -113,24 +108,19 @@ end
 -- helpers
 
 function get_angle(src,tgt)
-	local y2=tgt.pos.y  --target.y
-	local x2=tgt.pos.x  --target.x
+	local y2=tgt.y  --target.y
+	local x2=tgt.x  --target.x
 
-	local y1=src.pos.y  --source.y
-	local x1=src.pos.x  --source.x
+	local y1=src.y  --source.y
+	local x1=src.x  --source.x
 
 	return atan2(y2-y1,x2-x1)
 end
 
-function move(obj)
-	obj.pos.x+=obj.vel.x
-	obj.pos.y+=obj.vel.y
-end
-
 function draw_sprite(obj)
 	local s=obj.spr
-	local x=obj.pos.x
-	local y=obj.pos.y
+	local x=obj.x
+	local y=obj.y
 	
 	spr(s,x,y)
 end
